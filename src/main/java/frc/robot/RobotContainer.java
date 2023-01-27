@@ -10,7 +10,9 @@ import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.DefaultDrive;
 import frc.robot.commands.DriveDistance;
+import frc.robot.commands.DriveWithinDistance;
 import frc.robot.commands.TurnDeg;
+import frc.robot.commands.TurnDegGyro;
 import frc.robot.commands.HalveDriveSpeed;
 import frc.robot.commands.QuarterDriveSpeed;
 import frc.robot.commands.Auto_Pattern.ComplexAuto;
@@ -22,7 +24,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
-
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -32,7 +33,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 public class RobotContainer {
   //camera
   UsbCamera camera = CameraServer.startAutomaticCapture();
-
+  
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
 
@@ -76,13 +77,21 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // While holding the shoulder button, drive at half speed
-    new JoystickButton(m_driverController, Button.kB.value)
+    //kX = button b
+    //kA = button x
+    //kB = button a
+    //kY = button y
+    new JoystickButton(m_driverController, OIConstants.buttonY.value)
+        .onTrue(new TurnDegGyro(90, .25, m_robotDrive));
+    new JoystickButton(m_driverController, OIConstants.buttonB.value)
+        .onTrue(new DriveWithinDistance(40, .35, m_robotDrive));
+    new JoystickButton(m_driverController, OIConstants.buttonA.value)
         .onTrue(new TurnDeg(90, .5, m_robotDrive));
     new JoystickButton(m_driverController, Button.kRightBumper.value)
         .toggleOnTrue(new HalveDriveSpeed(m_robotDrive));
     new JoystickButton(m_driverController, Button.kLeftBumper.value)
         .toggleOnTrue(new QuarterDriveSpeed(m_robotDrive));
-new JoystickButton(m_driverController, Button.kA.value)
+    new JoystickButton(m_driverController, OIConstants.buttonX.value)
         .onTrue(new DriveDistance(60, 0.25, m_robotDrive));
     
   }
