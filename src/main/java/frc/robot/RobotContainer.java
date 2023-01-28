@@ -12,6 +12,7 @@ import frc.robot.commands.DefaultDrive;
 import frc.robot.commands.DriveDistance;
 import frc.robot.commands.TurnDeg;
 import frc.robot.commands.HalveDriveSpeed;
+import frc.robot.commands.PIDLockInPlace;
 import frc.robot.commands.QuarterDriveSpeed;
 import frc.robot.commands.Auto_Pattern.ComplexAuto;
 import frc.robot.commands.Auto_Pattern.Obstacle;
@@ -76,14 +77,16 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // While holding the shoulder button, drive at half speed
-    new JoystickButton(m_driverController, Button.kB.value)
+    new JoystickButton(m_driverController, OIConstants.buttonA.value)
         .onTrue(new TurnDeg(90, .5, m_robotDrive));
     new JoystickButton(m_driverController, Button.kRightBumper.value)
         .toggleOnTrue(new HalveDriveSpeed(m_robotDrive));
     new JoystickButton(m_driverController, Button.kLeftBumper.value)
         .toggleOnTrue(new QuarterDriveSpeed(m_robotDrive));
-new JoystickButton(m_driverController, Button.kA.value)
+    new JoystickButton(m_driverController, OIConstants.buttonX.value)
         .onTrue(new DriveDistance(60, 0.25, m_robotDrive));
+    new JoystickButton(m_driverController, OIConstants.buttonY.value)
+        .toggleOnTrue(new PIDLockInPlace(m_robotDrive));
     
   }
 
