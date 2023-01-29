@@ -18,6 +18,9 @@ public final class Constants {
   public static final class DriveConstants {
     public static final int kLeftMotorPort = 11;
     public static final int kRightMotorPort = 12;
+    // Analog inputs
+    public static final int kRangeFinderPort = 0;
+
    }
 
   public static final class OIConstants {

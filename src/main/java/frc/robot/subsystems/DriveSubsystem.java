@@ -4,18 +4,24 @@
 
 package frc.robot.subsystems;
 
+import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
 
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants.*;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.PIDConstants;
+import frc.robot.Constants.PhysicalConstants;
 
 public class DriveSubsystem extends SubsystemBase {
+  private final AHRS navx = new AHRS(edu.wpi.first.wpilibj.SPI.Port.kMXP);
 
   CANSparkMax m_leftMotor = new CANSparkMax(DriveConstants.kLeftMotorPort, MotorType.kBrushless);
   CANSparkMax m_rightMotor = new CANSparkMax(DriveConstants.kRightMotorPort, MotorType.kBrushless);
@@ -24,6 +30,10 @@ public class DriveSubsystem extends SubsystemBase {
   private final RelativeEncoder m_leftEncoder = m_leftMotor.getEncoder();
   private final RelativeEncoder m_rightEncoder = m_rightMotor.getEncoder();
   private boolean m_PIDmode = false;
+
+  private AnalogInput m_rangeFinder = new AnalogInput(DriveConstants.kRangeFinderPort);
+  
+
 
   // The robot's drive
   private final DifferentialDrive m_drive = new DifferentialDrive(m_leftMotor, m_rightMotor);
@@ -126,6 +136,13 @@ public class DriveSubsystem extends SubsystemBase {
   public double getAbsAverageEncoderDistance() {
     return (Math.abs(getLeftEncoderInches()) + Math.abs(getRightEncoderInches())) / 2;
   }
+  public void reset_gyro(){
+    navx.reset();
+  }
+  public double get_current_heading(){
+
+    return navx.getAngle();
+  } 
 
   /**
    * Sets the max output of the drive. Useful for scaling the drive to drive more
@@ -136,10 +153,28 @@ public class DriveSubsystem extends SubsystemBase {
   public void setMaxOutput(double maxOutput) {
     m_drive.setMaxOutput(maxOutput);
   }
+   // for finding the distance from the range finder
+  public double getRangeFinderDistance() {
+    double rawValue = m_rangeFinder.getValue();
+    //  double rangefinderVoltage = m_rangeFinder.getAverageVoltage();
+    //  double distanceInInches = (rangefinderVoltage * 65.4) - 7.2;
+    //  return distanceInInches;
+    //voltage_scale_factor allows us to compensate for differences in supply voltage.
 
+    double voltage_scale_factor = 1;//5/RobotController.getVoltage5V();
+      
+    double currentDistanceInches = rawValue * voltage_scale_factor * 0.0492;
+
+    return currentDistanceInches;
+    
+  }
+ 
   @Override
     public void periodic() {
       SmartDashboard.putNumber("Encoder Abs Avg", getAbsAverageEncoderDistance());
+      SmartDashboard.putNumber("Dist From Wall", getRangeFinderDistance());
+      SmartDashboard.putData(navx);
+      SmartDashboard.putNumber("Navx Pitch",navx.getPitch());
       // SmartDashboard.putNumber("Encoder Abs Avg", getAbsAverageEncoderDistance());
       SmartDashboard.putNumber("Encoder Position", getAverageEncoderDistance());
       SmartDashboard.putNumber("Encoder Ticks", m_leftEncoder.getPosition());//log();
