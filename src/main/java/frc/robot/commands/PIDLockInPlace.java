@@ -10,8 +10,10 @@ import frc.robot.subsystems.DriveSubsystem;
 public class PIDLockInPlace extends CommandBase {
   /** Creates a new PIDDrive. */
   private DriveSubsystem m_drive;
-  public PIDLockInPlace(DriveSubsystem m_drive) {
-    addRequirements(m_drive);
+
+  public PIDLockInPlace(DriveSubsystem drive) {
+    m_drive = drive;
+    addRequirements(m_drive);    
   }
 
   // Called when the command is initially scheduled.

@@ -21,25 +21,40 @@ import frc.robot.Constants.PIDConstants;
 import frc.robot.Constants.PhysicalConstants;
 
 public class DriveSubsystem extends SubsystemBase {
-  private final AHRS navx = new AHRS(edu.wpi.first.wpilibj.SPI.Port.kMXP);
 
-  CANSparkMax m_leftMotor = new CANSparkMax(DriveConstants.kLeftMotorPort, MotorType.kBrushless);
-  CANSparkMax m_rightMotor = new CANSparkMax(DriveConstants.kRightMotorPort, MotorType.kBrushless);
+  // class members
+  private AHRS navx;
 
-  private SparkMaxPIDController m_leftPIDController, m_rightPIDController;
-  private final RelativeEncoder m_leftEncoder = m_leftMotor.getEncoder();
-  private final RelativeEncoder m_rightEncoder = m_rightMotor.getEncoder();
+  CANSparkMax m_leftMotor;
+  CANSparkMax m_rightMotor;
+
+  private SparkMaxPIDController m_leftPIDController;
+  private SparkMaxPIDController m_rightPIDController;
+  private RelativeEncoder m_leftEncoder;
+  private RelativeEncoder m_rightEncoder;
+  private AnalogInput m_rangeFinder;
   private boolean m_PIDmode = false;
-
-  private AnalogInput m_rangeFinder = new AnalogInput(DriveConstants.kRangeFinderPort);
-  
-
 
   // The robot's drive
   private final DifferentialDrive m_drive = new DifferentialDrive(m_leftMotor, m_rightMotor);
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+
+    navx = new AHRS(edu.wpi.first.wpilibj.SPI.Port.kMXP);
+
+    m_leftMotor = new CANSparkMax(DriveConstants.kLeftMotorPort, MotorType.kBrushless);
+    m_rightMotor = new CANSparkMax(DriveConstants.kRightMotorPort, MotorType.kBrushless);
+  
+    m_leftEncoder = m_leftMotor.getEncoder();
+    m_rightEncoder = m_rightMotor.getEncoder();
+    m_rangeFinder = new AnalogInput(DriveConstants.kRangeFinderPort);
+    m_PIDmode = false;
+  
+    // The robot's drive
+    //DifferentialDrive m_drive = new DifferentialDrive(m_leftMotor, m_rightMotor);
+  
+  
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
@@ -65,7 +80,6 @@ public class DriveSubsystem extends SubsystemBase {
     m_leftMotor.restoreFactoryDefaults();
     m_rightMotor.restoreFactoryDefaults();
     resetEncoders();
-    resetEncoders();
     
     //Our Specific settings
     m_leftMotor.setIdleMode(IdleMode.kBrake);
@@ -76,7 +90,6 @@ public class DriveSubsystem extends SubsystemBase {
     m_rightEncoder.setPositionConversionFactor(1);
     m_leftEncoder.setPosition(0);
     m_rightEncoder.setPosition(0);
-
   }
 
   public void cancelPIDMode() {
@@ -95,7 +108,7 @@ public class DriveSubsystem extends SubsystemBase {
     m_leftPIDController.setD(PIDConstants.kD);
     m_leftPIDController.setIZone(PIDConstants.kIz);
     m_leftPIDController.setFF(PIDConstants.kFF);
-    m_leftPIDController.setOutputRange(PIDConstants.kMinOutput, PIDConstants.kMaxOutput);
+// Spark manual says to do this via the desktop client    m_leftPIDController.setOutputRange(PIDConstants.kMinOutput, PIDConstants.kMaxOutput);
  
     //pid 2
     m_rightPIDController.setP(PIDConstants.kP);
@@ -103,7 +116,7 @@ public class DriveSubsystem extends SubsystemBase {
     m_rightPIDController.setD(PIDConstants.kD);
     m_rightPIDController.setIZone(PIDConstants.kIz);
     m_rightPIDController.setFF(PIDConstants.kFF);
-    m_rightPIDController.setOutputRange(PIDConstants.kMinOutput, PIDConstants.kMaxOutput);
+// Spark manual says to do this via the desktop client    m_rightPIDController.setOutputRange(PIDConstants.kMinOutput, PIDConstants.kMaxOutput);
   }
 
   public void setVelocityLeftMotor(double velocity) {
