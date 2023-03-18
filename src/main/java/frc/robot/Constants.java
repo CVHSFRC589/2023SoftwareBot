@@ -168,5 +168,10 @@ public final class Constants {
     public static final String VISUAL_FEEDBACK_TABLE_ENTRY_NAME = "VF Pattern";
     public static final String PATTERN_FINISHED_ENTRY_NAME = "VF Pattern done";
   }
+  public static final class LimeLightConstants{
+    public static final double HUB_HEIGHT = 24;
+    public static final double LIMELIGHT_MOUNT_ANGLE = 34;
+    public static final double LIMELIGHT_HEIGHT = 8;//inches
+  }
 
 }

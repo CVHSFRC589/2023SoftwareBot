@@ -130,7 +130,10 @@ public class RobotContainer {
         private void configureButtonBindings() {
 
                 // ==========================================DRIVER CONTROLS========================================== \\
-
+                
+                //TURN TO TARGET
+                new JoystickButton(m_driverJoyStickLeft, 2)
+                                .toggleOnTrue(new TurnToTarget(m_robotDrive));
                 // DRIVE AND BALANCE
                 new JoystickButton(m_driverJoyStickLeft, 11)
                                 .toggleOnTrue(new DriveAndBalance(m_robotDrive, 36));

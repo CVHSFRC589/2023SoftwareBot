@@ -22,6 +22,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IDConstants;
 import frc.robot.Constants.LEDConstants;
 import frc.robot.Constants;
+import frc.robot.LimeLight;
+import frc.robot.LimeLightAiming;
 import frc.robot.Constants.DrivePIDConstants;
 import frc.robot.Constants.PhysicalConstants;
 
@@ -59,7 +61,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   private DifferentialDrive m_drive;
   private BooleanSupplier m_driveType;// true is arcade false is tank drive
-
+  private LimeLightAiming m_limelight;
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
     // We need to invert one side of the drivetrain so that positive voltages
@@ -108,7 +110,8 @@ public class DriveSubsystem extends SubsystemBase {
     m_table = NetworkTableInstance.getDefault().getTable(LEDConstants.NETWORK_TABLE_NAME);
     m_patternOver = m_table.getEntry(LEDConstants.PATTERN_FINISHED_ENTRY_NAME);
     m_pattern = m_table.getEntry(LEDConstants.VISUAL_FEEDBACK_TABLE_ENTRY_NAME);
-
+    m_limelight = new LimeLightAiming();
+    setPipeline(1);
   }
 
   /**
@@ -324,7 +327,40 @@ public class DriveSubsystem extends SubsystemBase {
       return 0;
     }
   }
-
+  public void setPipeline(int pipe)
+    {
+      m_limelight.setPipeline(pipe);
+    }
+  public double limeAdjustLeftRightVelocity() {
+    double direction = Math.abs(m_limelight.getdegRotationToTarget()) / m_limelight.getdegRotationToTarget();
+    if (m_limelight.getIsTargetFound()) {
+     // m_drivetrain.setMotors(-direction*m_targetFoundSpeed,
+      // direction*m_targetFoundSpeed);
+      return clampValue(direction*Math.pow(m_limelight.getdegRotationToTarget()*2, 2), 250, 5000);
+      // return m_Limelight.getdegRotationToTarget()*200;
+      // }
+    } else {
+      // m_drivetrain.setMotors(-m_noTargetSpeed, m_noTargetSpeed);
+      return 589;
+      
+    }
+  }
+  public double clampValue(double x, double min, double max) {
+    double signx = Math.abs(x)/x;
+    if (Math.abs(x) > max) {
+      return  max*signx;
+    } else if (Math.abs(x) < min) {
+      return min*signx;
+    } else {
+      return x;
+    }
+  }
+  public boolean limeIsTargetFound(){
+    return m_limelight.getIsTargetFound();
+  }
+  public double getLimeDegToTarget(){
+    return m_limelight.getdegRotationToTarget();
+  }
   /**
    * Sets the max output of the drive. Useful for scaling the drive to drive more
    * slowly.
@@ -420,7 +456,7 @@ public class DriveSubsystem extends SubsystemBase {
     m_rightPIDController.setFF(DrivePIDConstants.kFFsv, DrivePIDConstants.smartVelocitySlot);
 
   }
-
+  
   public void setVelocityLeftMotor(double velocity) {
     m_leftPIDController.setReference(velocity, CANSparkMax.ControlType.kSmartVelocity,
         DrivePIDConstants.smartVelocitySlot);
@@ -476,6 +512,8 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Encoder Position", getAverageEncoderDistance());
     SmartDashboard.putNumber("Encoder Ticks", m_leftEncoder.getPosition());
     SmartDashboard.putNumber("Process Variable", processVariable);
+
+    SmartDashboard.putNumber("Limelight Distance", m_limelight.estimateTargetDistance());
 
     // PIGEON
     SmartDashboard.putData(m_pigeon2);
